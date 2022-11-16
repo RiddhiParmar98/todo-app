@@ -1,9 +1,17 @@
-import logo from "./logo.svg";
 import "./App.css";
-import TodoForm from "./Pages/TodoForm";
+import TodoForm from "./Pages/todo";
+import { Container } from "@mui/material";
+import TodoList from "./Pages/todo/TodoList";
 
 function App() {
-  return <TodoForm />;
+  return (
+    <div>
+      <Container>
+        <TodoForm />
+        <TodoList />
+      </Container>
+    </div>
+  );
 }
 
 export default App;
