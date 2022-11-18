@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import { useDispatch, useSelector } from "react-redux";
-import { createTodo } from "./TodoSlice";
+import { createTodo, editTodo } from "./TodoSlice";
 import {
   Box,
   FormControl,
@@ -14,19 +14,30 @@ import {
 import InputControl from "../InputControl";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
-const TodoForm = () => {
+const TodoForm = (props) => {
+  const { isEdit } = props;
+  const todo = useSelector((state) => [...state.todos]);
+  const param = useParams();
   const fileRef = useRef(null);
+  const updateDataIndex = todo.findIndex(
+    (todoItem) => todoItem.id === param.id
+  );
   const dispatch = useDispatch();
+  const navigate = useNavigate("");
   const handleClick = () => {
     fileRef.current.click();
   };
 
-  const intialValue = {
-    title: "",
-    description: "",
-    imageUrl: "",
-  };
+  const intialValue = isEdit
+    ? todo[updateDataIndex]
+    : {
+        title: "",
+        description: "",
+        imageUrl: "",
+      };
 
   const validationSchema = Yup.object().shape({
     title: Yup.string()
@@ -38,20 +49,28 @@ const TodoForm = () => {
   });
 
   const handleSubmit = (values, { isSubmitting }) => {
-    const id = `id${Math.floor(Math.random() * 1000000000)}`;
-    const date = new Date();
-    const newTodo = {
-      id,
-      date,
-      ...values,
-    };
-    dispatch(createTodo(newTodo));
+    if (isEdit) {
+      dispatch(editTodo(values));
+    } else {
+      const id = `id${Math.floor(Math.random() * 1000000000)}`;
+      const date = new Date();
+      const newTodo = {
+        id,
+        date,
+        ...values,
+      };
+      dispatch(createTodo(newTodo));
+    }
+    navigate("/todolist");
   };
 
   const handleImageUpload = (event, setFieldValue) => {
-    const imageUrl = URL.createObjectURL(event.target.files[0]);
-    console.log(imageUrl);
-    setFieldValue("imageUrl", imageUrl);
+    const file = event.target.files[0];
+    var reader = new FileReader();
+    reader.onload = function () {
+      setFieldValue("imageUrl", reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
