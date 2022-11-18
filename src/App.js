@@ -7,12 +7,11 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { Route, Routes } from "react-router-dom";
 
-
 const publicRoutesOptions = [
   { component: <Login />, path: "/" },
-  { component: <TodoForm />, path: "/addtodo" },
   { component: <TodoList />, path: "/todolist" },
-  { component: <TodoForm />, path: "/edittodo:id" },
+  { component: <TodoForm />, path: "/addtodo" },
+  { component: <TodoForm isEdit />, path: "/edittodo/:id" },
 ];
 
 function App() {
