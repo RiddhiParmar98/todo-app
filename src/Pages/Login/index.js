@@ -8,22 +8,33 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import GoogleIcon from "@mui/icons-material/Google";
-import {
-  logInWithEmailAndPassword,
-  loginWithGoogle,
-  logOut,
-} from "../../firebase/firebaseMethods";
+
+import InputControl from "../InputControl";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { toast } from "react-toastify";
+import { loginUser, logOutUser } from "./userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  FacebookAuthProvider,
+  getAuth,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
+import { app } from "../../firebase";
 
 const Login = () => {
-  const [user, setUser] = useState("");
-  const [formData, setFormData] = useState({});
-  // const navigate = useNavigate();
 
+  const auth = getAuth(app);
+  const navigate = useNavigate();
+  // const user = useSelector((state) => [...state.user]);
+  const dispatch = useDispatch();
   const initialValues = { email: "", password: "" };
   const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -33,22 +44,95 @@ const Login = () => {
   });
 
   const handleSubmit = (values, { setSubmitting }) => {
-    console.log("values 111: ", values);
-    console.log("Login");
-    // logInWithEmailAndPassword(formData.email, formData.password);
+    // console.log('values: ', values);
+    // try {
+    // let user = logInWithEmailAndPassword(values.email, values.password);
+    // console.log("user: ",user)
+    // console.log('userData: ', userData);
+    // localStorage.setItem("accessToken", accessToken);
+    // navigate("/todolist", { replace: true });
     // setUser(formData)
+    // } catch (error) {
+    // console.log(error);
+    // toast.error("Incorrect Username or Password");
+    // }
+    signInWithEmailAndPassword(auth, values.email, values.password)
+      .then((userAuth) => {
+        console.log("userAuth: ", userAuth);
+        const user = {
+          email: userAuth?.user?.email,
+          uid: userAuth?.user?.uid,
+        };
+        console.log("user", user);
+        dispatch(loginUser(user));
+        localStorage.setItem("accessToken", userAuth?.user?.accessToken);
+        navigate("/todolist", { replace: true });
+      })
+      .catch((err) => {
+        alert(err);
+      });
   };
 
-  const handleSocialLogin = (event) => {
-    event.preventDefault();
-    loginWithGoogle();
-    // navigate("/");
+  const handleGoogleSocialLogin = () => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const userData = {
+          accessToken: result?.user?.accessToken,
+          user: result?.user,
+        };
+        console.log("userData", userData);
+        dispatch(loginUser(userData));
+        localStorage.setItem("accessToken", result?.user?.accessToken);
+        navigate("/todolist", { replace: true });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log("errorMessage: ", errorMessage);
+        toast.error(errorMessage);
+        // const email = error.customData.email;
+        // toast.error(GoogleAuthProvider.credentialFromError(err));
+      });
+  };
+
+  const handleFacebookSocialLogin = () => {
+    const provider = new FacebookAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const credential = FacebookAuthProvider.credentialFromResult(result);
+        const userData = {
+          accessToken: result?.user?.accessToken,
+          user: result?.user,
+        };
+        console.log("userData", userData.accessToken);
+        dispatch(loginUser(userData));
+        localStorage.setItem("accessToken", result?.user?.accessToken);
+        navigate("/todolist", { replace: true });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.customData.email;
+        const credential = FacebookAuthProvider.credentialFromError(error);
+        toast.error(errorMessage);
+      });
   };
 
   const handleLogout = () => {
-    logOut();
+    signOut(auth)
+      .then(() => {
+        dispatch(logOutUser());
+        localStorage.clear();
+        navigate("/");
+        console.log("logout");
+      })
+      .catch((error) => {
+        console.log("error", error);
+      });
   };
-  console.log("user", user);
+
   return (
     <Grid container component="main" sx={{ height: "100vh" }}>
       <Grid
@@ -89,15 +173,15 @@ const Login = () => {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ handleSubmit, getFieldProps,values }) => (
+            {({ handleSubmit, getFieldProps, values }) => (
               <Box
                 component="form"
                 noValidate
                 sx={{ mt: 1 }}
                 onSubmit={handleSubmit}
               >
-                {console.log('values', values)}
-                <TextField
+                <InputControl
+                  component={TextField}
                   margin="normal"
                   required
                   fullWidth
@@ -106,12 +190,9 @@ const Login = () => {
                   name="email"
                   autoComplete="email"
                   {...getFieldProps("email")}
-                  // autoFocus
-                  // onChange={(e) =>
-                  //   setFormData({ ...formData, email: e.target.value })
-                  // }
                 />
-                <TextField
+                <InputControl
+                  component={TextField}
                   margin="normal"
                   required
                   fullWidth
@@ -121,9 +202,6 @@ const Login = () => {
                   id="password"
                   autoComplete="current-password"
                   {...getFieldProps("password")}
-                  // onChange={(e) =>
-                  //   setFormData({ ...formData, password: e.target.value })
-                  // }
                 />
                 {/* <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
@@ -146,21 +224,12 @@ const Login = () => {
                   OR
                 </Typography>
                 <Grid container>
-                  {/* <Button
-                variant="outlined"
-                type="submit"
-                sx={{ ml: 3 }}
-                color="secondary"
-                startIcon={<FacebookIcon />}
-              >
-                Login with Facebook
-              </Button> */}
                   <Button
                     variant="contained"
                     type="submit"
                     fullWidth
-                    onClick={handleSocialLogin}
-                    sx={{ mt: 2 }}
+                    onClick={handleGoogleSocialLogin}
+                    sx={{ mt: 1 }}
                     color="primary"
                     startIcon={<GoogleIcon />}
                   >
@@ -169,6 +238,18 @@ const Login = () => {
 
                   <Button
                     variant="outlined"
+                    type="submit"
+                    fullWidth
+                    onClick={handleFacebookSocialLogin}
+                    sx={{ mt: 1 }}
+                    color="secondary"
+                    startIcon={<FacebookIcon />}
+                  >
+                    Login with Facebook
+                  </Button>
+
+                  <Button
+                    // variant="outlined"
                     onClick={handleLogout}
                     color="error"
                   >
