@@ -1,6 +1,5 @@
 import "./App.css";
 import TodoForm from "./Pages/todo";
-import { Container } from "@mui/material";
 import TodoList from "./Pages/todo/TodoList";
 import Login from "./Pages/Login";
 import { ToastContainer } from "react-toastify";
@@ -23,7 +22,7 @@ function App() {
           <Route key={idx} exact {...{ path, element: component }} />
         ))}
       </Routes>
-      <ToastContainer autoClose={500} />
+      <ToastContainer autoClose={1000} />
     </div>
   );
 }
