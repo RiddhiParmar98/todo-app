@@ -19,7 +19,7 @@ import { useParams } from "react-router-dom";
 
 const TodoForm = (props) => {
   const { isEdit } = props;
-  const todo = useSelector((state) => [...state.todos]);
+  const todo = useSelector((state) => [...state.todo.todos]);
   const param = useParams();
   const fileRef = useRef(null);
   const updateDataIndex = todo.findIndex(

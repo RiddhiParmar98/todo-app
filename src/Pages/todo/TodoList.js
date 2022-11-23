@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const TodoList = () => {
-  const todo = useSelector((state) => [...state.todos]);
+  const todo = useSelector((state) => [...state.todo.todos]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleAddList = () => {
@@ -107,7 +107,7 @@ const TodoList = () => {
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5]}
-            checkboxSelection
+            // checkboxSelection
           />
         </div>
       </Box>

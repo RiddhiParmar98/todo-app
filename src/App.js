@@ -5,9 +5,11 @@ import Login from "./Pages/Login";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import { Route, Routes } from "react-router-dom";
+import SignUp from "./Pages/signup";
 
 const publicRoutesOptions = [
-  { component: <Login />, path: "/" },
+  { component: <SignUp />, path: "/" },
+  { component: <Login />, path: "/login" },
   { component: <TodoList />, path: "/todolist" },
   { component: <TodoForm />, path: "/addtodo" },
   { component: <TodoForm isEdit />, path: "/edittodo/:id" },
