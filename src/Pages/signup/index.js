@@ -21,12 +21,13 @@ import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import { app } from "../../firebase";
 import { addDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
-const SignUp = () => {
+const SignUp = (props) => {
+  const { users } = props;
   const auth = getAuth(app);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
-  const [getUser, setGetUser] = useState([]);
+
   const initialValues = {
     firstname: "",
     lastname: "",
@@ -35,7 +36,7 @@ const SignUp = () => {
     password: "",
     cPassword: "",
   };
-
+  console.log("user :>> ", user);
   const validationSchema = Yup.object({
     firstname: Yup.string()
       .max(20, "Must be 15 characters or less")
@@ -58,20 +59,6 @@ const SignUp = () => {
         ),
       }),
   });
-
-  const fetchPost = async () => {
-    await getDocs(collection(db, "registerUser")).then((querySnapshot) => {
-      const newData = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-      setGetUser(newData);
-    });
-  };
-
-  useEffect(() => {
-    fetchPost();
-  }, []);
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
@@ -231,7 +218,7 @@ const SignUp = () => {
                 </Button>
                 <Grid container justifyContent="flex-end">
                   <Grid item>
-                    <Link to="/login" style={{ color: "blue" }}>
+                    <Link to="/" style={{ color: "blue" }}>
                       Already have an account? Sign in
                     </Link>
                   </Grid>

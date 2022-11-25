@@ -7,12 +7,12 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import GoogleIcon from "@mui/icons-material/Google";
-import EmailIcon from "@mui/icons-material/Email";
+// import EmailIcon from "@mui/icons-material/Email";
 
 import InputControl from "../InputControl";
 import { Formik } from "formik";
@@ -21,7 +21,7 @@ import { toast } from "react-toastify";
 import { loginUser, logOutUser } from "./userSlice";
 import { blue } from "@mui/material/colors";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   FacebookAuthProvider,
   getAuth,
@@ -30,11 +30,12 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { app } from "../../firebase";
+import { app, db } from "../../firebase";
+// import { collection, getDocs } from "firebase/firestore";
 
-const Login = () => {
-  const color = blue[900];
-
+const Login = (props) => {
+  const { users } = props;
+  // const color = blue[900];
   const auth = getAuth(app);
   const navigate = useNavigate();
   // const user = useSelector((state) => [...state.user]);
@@ -48,7 +49,23 @@ const Login = () => {
   });
 
   const handleSubmit = (values, { setSubmitting }) => {
-    // console.log('values: ', values);
+    try {
+      const getUser =
+        users.length &&
+        users.filter(
+          (dataItem, idx) =>
+            values.email === dataItem.user.email &&
+            values.password === dataItem.user.password
+        );
+
+      if (getUser.length !== 0) {
+        navigate("/todolist", { replace: true });
+      } else {
+        toast.error("Incorrect email id or password");
+      }
+    } catch (error) {
+      toast.error("Invalid Credentials");
+    }
     // try {
     // let user = logInWithEmailAndPassword(values.email, values.password);
     // console.log("user: ",user)
@@ -60,21 +77,21 @@ const Login = () => {
     // console.log(error);
     // toast.error("Incorrect Username or Password");
     // }
-    signInWithEmailAndPassword(auth, values.email, values.password)
-      .then((userAuth) => {
-        console.log("userAuth: ", userAuth);
-        const user = {
-          email: userAuth?.user?.email,
-          uid: userAuth?.user?.uid,
-        };
-        console.log("user", user);
-        dispatch(loginUser(user));
-        localStorage.setItem("accessToken", userAuth?.user?.accessToken);
-        navigate("/todolist", { replace: true });
-      })
-      .catch((err) => {
-        alert(err);
-      });
+    // signInWithEmailAndPassword(auth, values.email, values.password)
+    //   .then((userAuth) => {
+    //     console.log("userAuth: ", userAuth);
+    //     const user = {
+    //       email: userAuth?.user?.email,
+    //       uid: userAuth?.user?.uid,
+    //     };
+    //     console.log("user", user);
+    //     dispatch(loginUser(user));
+    //     localStorage.setItem("accessToken", userAuth?.user?.accessToken);
+    //     navigate("/todolist", { replace: true });
+    //   })
+    //   .catch((err) => {
+    //     alert(err);
+    //   });
   };
 
   const handleGoogleSocialLogin = () => {
@@ -86,7 +103,6 @@ const Login = () => {
           accessToken: result?.user?.accessToken,
           user: result?.user,
         };
-        console.log("userData", userData);
         dispatch(loginUser(userData));
         localStorage.setItem("accessToken", result?.user?.accessToken);
         navigate("/todolist", { replace: true });
@@ -94,7 +110,6 @@ const Login = () => {
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.log("errorMessage: ", errorMessage);
         toast.error(errorMessage);
         // const email = error.customData.email;
         // toast.error(GoogleAuthProvider.credentialFromError(err));
@@ -113,7 +128,6 @@ const Login = () => {
           accessToken: result?.user?.accessToken,
           user: result?.user,
         };
-        console.log("userData", userData.accessToken);
         dispatch(loginUser(userData));
         localStorage.setItem("accessToken", result?.user?.accessToken);
         navigate("/todolist", { replace: true });
@@ -132,8 +146,7 @@ const Login = () => {
       .then(() => {
         dispatch(logOutUser());
         localStorage.clear();
-        navigate("/");
-        console.log("logout");
+        navigate("/", { replace: true });
       })
       .catch((error) => {
         console.log("error", error);
@@ -247,17 +260,19 @@ const Login = () => {
                   >
                     Login with Facebook
                   </Button>
-                  <Button
-                    variant="contained"
-                    type="submit"
-                    fullWidth
-                    onClick={handleSignUp}
-                    sx={{ mt: 1, backgroundColor: "grey" }}
-                    startIcon={<EmailIcon />}
-                    size="small"
-                  >
-                    Sign up with Email and Password
-                  </Button>
+                </Grid>
+                <Grid
+                  sx={{
+                    mt: 2,
+                  }}
+                  container
+                  justifyContent="flex-end"
+                >
+                  <Grid item>
+                    <Link to="/signup" style={{ color: "blue" }}>
+                      New User?create an Account here
+                    </Link>
+                  </Grid>
                 </Grid>
               </Box>
             )}

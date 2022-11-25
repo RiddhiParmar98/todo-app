@@ -16,11 +16,11 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 import { db } from "../../firebase";
 
 const TodoForm = (props) => {
-  const { isEdit } = props;
+  const { isEdit, todos } = props;
   const todo = useSelector((state) => [...state.todo.todos]);
   const param = useParams();
   const fileRef = useRef(null);
@@ -28,7 +28,7 @@ const TodoForm = (props) => {
     (todoItem) => todoItem.id === param.id
   );
   const dispatch = useDispatch();
-  const navigate = useNavigate("");
+  const navigate = useNavigate();
   const handleClick = () => {
     fileRef.current.click();
   };
@@ -66,7 +66,7 @@ const TodoForm = (props) => {
         todo: newTodo,
       });
     }
-    navigate("/todolist");
+    navigate("/todolist", { replace: true });
   };
 
   const handleImageUpload = (event, setFieldValue) => {
