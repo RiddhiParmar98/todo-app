@@ -26,7 +26,6 @@ const TodoList = () => {
   const handleDelete = (event, id) => {
     Swal.fire({
       title: "Are you sure you want to delete this?",
-      // text: "You won't be able to revert this!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -43,7 +42,6 @@ const TodoList = () => {
         dispatch(logOutUser());
         localStorage.clear();
         navigate("/");
-        console.log("logout");
       })
       .catch((error) => {
         console.log("error", error);
@@ -131,7 +129,6 @@ const TodoList = () => {
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5]}
-            // checkboxSelection
           />
         </div>
       </Box>

@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import FacebookIcon from "@mui/icons-material/Facebook";
@@ -17,7 +17,7 @@ import InputControl from "../InputControl";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-import { loginUser } from "./userSlice";
+import { createUser, loginUser } from "./userSlice";
 import { blue } from "@mui/material/colors";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -29,7 +29,8 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { app } from "../../firebase";
+import { app, db } from "../../firebase";
+import { addDoc, collection } from "firebase/firestore";
 
 const Login = () => {
   const color = blue[900];
@@ -46,15 +47,12 @@ const Login = () => {
   });
 
   const handleSubmit = (values, { setSubmitting }) => {
-  
     signInWithEmailAndPassword(auth, values.email, values.password)
       .then((userAuth) => {
-        console.log("userAuth: ", userAuth);
         const user = {
           email: userAuth?.user?.email,
           uid: userAuth?.user?.uid,
         };
-        console.log("user", user);
         dispatch(loginUser(user));
         localStorage.setItem("accessToken", userAuth?.user?.accessToken);
         navigate("/todolist", { replace: true });
@@ -64,18 +62,27 @@ const Login = () => {
       });
   };
 
-  const handleGoogleSocialLogin = () => {
+  const handleGoogleSocialLogin = async () => {
+    const id = `id${Math.floor(Math.random() * 1000000000)}`;
+    const date = new Date();
     const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
+    await signInWithPopup(auth, provider)
       .then((result) => {
         const credential = GoogleAuthProvider.credentialFromResult(result);
+        const username = result?.user?.displayName?.split(" ");
         const userData = {
-          accessToken: result?.user?.accessToken,
-          user: result?.user,
+          id: id,
+          date: date,
+          username: result?.user?.displayName,
+          email: result?.user?.email,
+          firstname: username[0],
+          lastname: username[1],
         };
-        console.log("userData", userData);
-        dispatch(loginUser(userData));
-        localStorage.setItem("accessToken", result?.user?.accessToken);
+        const docRef = addDoc(collection(db, "registerUser"), {
+          user: userData,
+        });
+        dispatch(createUser(userData));
+        localStorage.setItem("accessToken", userData?.accessToken);
         navigate("/todolist", { replace: true });
       })
       .catch((error) => {
@@ -88,16 +95,25 @@ const Login = () => {
   };
 
   const handleFacebookSocialLogin = () => {
+    const id = `id${Math.floor(Math.random() * 1000000000)}`;
+    const date = new Date();
     const provider = new FacebookAuthProvider();
     signInWithPopup(auth, provider)
       .then((result) => {
         const credential = FacebookAuthProvider.credentialFromResult(result);
-        const userData = {
-          accessToken: result?.user?.accessToken,
-          user: result?.user,
-        };
-        console.log("userData", userData.accessToken);
-        dispatch(loginUser(userData));
+        // const username = result?.user?.displayName?.split(" ");
+        // const userData = {
+        //   id: id,
+        //   date: date,
+        //   username: result?.user?.displayName,
+        //   email: result?.user?.email,
+        //   firstname: username[0],
+        //   lastname: username[1],
+        // };
+        // const docRef = addDoc(collection(db, "registerUser"), {
+        //   user: userData,
+        // });
+        // dispatch(createUser(userData));
         localStorage.setItem("accessToken", result?.user?.accessToken);
         navigate("/todolist", { replace: true });
       })
@@ -194,7 +210,6 @@ const Login = () => {
                 <Grid container>
                   <Button
                     variant="contained"
-                    type="submit"
                     fullWidth
                     onClick={handleGoogleSocialLogin}
                     sx={{ mt: 1 }}
@@ -206,7 +221,6 @@ const Login = () => {
 
                   <Button
                     variant="contained"
-                    type="submit"
                     fullWidth
                     onClick={handleFacebookSocialLogin}
                     sx={{ mt: 1, backgroundColor: "#0d47a1" }}
