@@ -11,16 +11,17 @@ import { app } from "../../firebase";
 import { logOutUser } from "../Login/userSlice";
 import Swal from "sweetalert2";
 
-const TodoList = () => {
+const TodoList = (props) => {
+  const { todos } = props;
   const auth = getAuth(app);
   const todo = useSelector((state) => [...state.todo.todos]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleAddList = () => {
-    navigate("/addtodo");
+    navigate("/addtodo", { replace: true });
   };
   const handleEditTodo = (event, id) => {
-    navigate(`/edittodo/${id}`);
+    navigate(`/edittodo/${id}`, { replace: true });
   };
 
   const handleDelete = (event, id) => {
