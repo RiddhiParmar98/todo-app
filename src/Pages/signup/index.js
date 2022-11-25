@@ -11,7 +11,7 @@ import {
 import { ErrorMessage, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import InputControl from "../InputControl";
@@ -120,7 +120,7 @@ const SignUp = () => {
         }}
       >
         <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-          <LockOutlinedIcon />
+          <AccountCircleIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
           Sign up

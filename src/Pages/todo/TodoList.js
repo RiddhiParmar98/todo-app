@@ -6,9 +6,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { deleteTodo } from "./TodoSlice";
 import { useNavigate } from "react-router-dom";
+import { getAuth, signOut } from "firebase/auth";
+import { app } from "../../firebase";
+import { logOutUser } from "../Login/userSlice";
 import Swal from "sweetalert2";
 
 const TodoList = () => {
+  const auth = getAuth(app);
   const todo = useSelector((state) => [...state.todo.todos]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -33,6 +37,19 @@ const TodoList = () => {
     });
   };
 
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        dispatch(logOutUser());
+        localStorage.clear();
+        navigate("/");
+        console.log("logout");
+      })
+      .catch((error) => {
+        console.log("error", error);
+      });
+  };
+
   const columns = [
     { field: "id", headerName: "ID", width: 200 },
     { field: "title", headerName: "Title", width: 200 },
@@ -46,7 +63,6 @@ const TodoList = () => {
       field: "action",
       headerName: "Action",
       sortable: false,
-      // disableClickEventBubbling: true,
       disableSelectionOnClick: true,
       disableColumnMenu: true,
       width: 200,
@@ -90,6 +106,14 @@ const TodoList = () => {
             }}
           />
           Add TODO
+        </Button>
+
+        <Button
+          variant="contained"
+          sx={{ backgroundColor: "red", ml: "89%", borderRadius: 4 }}
+          onClick={handleLogout}
+        >
+          Logout
         </Button>
       </Box>
       <Box

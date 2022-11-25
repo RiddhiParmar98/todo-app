@@ -13,12 +13,11 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import GoogleIcon from "@mui/icons-material/Google";
 import EmailIcon from "@mui/icons-material/Email";
-
 import InputControl from "../InputControl";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-import { loginUser, logOutUser } from "./userSlice";
+import { loginUser } from "./userSlice";
 import { blue } from "@mui/material/colors";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -34,7 +33,6 @@ import { app } from "../../firebase";
 
 const Login = () => {
   const color = blue[900];
-
   const auth = getAuth(app);
   const navigate = useNavigate();
   // const user = useSelector((state) => [...state.user]);
@@ -48,18 +46,7 @@ const Login = () => {
   });
 
   const handleSubmit = (values, { setSubmitting }) => {
-    // console.log('values: ', values);
-    // try {
-    // let user = logInWithEmailAndPassword(values.email, values.password);
-    // console.log("user: ",user)
-    // console.log('userData: ', userData);
-    // localStorage.setItem("accessToken", accessToken);
-    // navigate("/todolist", { replace: true });
-    // setUser(formData)
-    // } catch (error) {
-    // console.log(error);
-    // toast.error("Incorrect Username or Password");
-    // }
+  
     signInWithEmailAndPassword(auth, values.email, values.password)
       .then((userAuth) => {
         console.log("userAuth: ", userAuth);
@@ -92,12 +79,8 @@ const Login = () => {
         navigate("/todolist", { replace: true });
       })
       .catch((error) => {
-        const errorCode = error.code;
         const errorMessage = error.message;
-        console.log("errorMessage: ", errorMessage);
         toast.error(errorMessage);
-        // const email = error.customData.email;
-        // toast.error(GoogleAuthProvider.credentialFromError(err));
       });
   };
   const handleSignUp = () => {
@@ -119,24 +102,8 @@ const Login = () => {
         navigate("/todolist", { replace: true });
       })
       .catch((error) => {
-        const errorCode = error.code;
         const errorMessage = error.message;
-        const email = error.customData.email;
-        const credential = FacebookAuthProvider.credentialFromError(error);
         toast.error(errorMessage);
-      });
-  };
-
-  const handleLogout = () => {
-    signOut(auth)
-      .then(() => {
-        dispatch(logOutUser());
-        localStorage.clear();
-        navigate("/");
-        console.log("logout");
-      })
-      .catch((error) => {
-        console.log("error", error);
       });
   };
 
