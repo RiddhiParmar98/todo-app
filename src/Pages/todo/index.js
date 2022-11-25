@@ -16,6 +16,8 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import { addDoc, collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
 
 const TodoForm = (props) => {
   const { isEdit } = props;
@@ -48,7 +50,7 @@ const TodoForm = (props) => {
       .required("Description is Required"),
   });
 
-  const handleSubmit = (values, { isSubmitting }) => {
+  const handleSubmit = async (values, { isSubmitting }) => {
     if (isEdit) {
       dispatch(editTodo(values));
     } else {
@@ -60,6 +62,9 @@ const TodoForm = (props) => {
         ...values,
       };
       dispatch(createTodo(newTodo));
+      const docRef = await addDoc(collection(db, "todos"), {
+        todo: newTodo,
+      });
     }
     navigate("/todolist");
   };

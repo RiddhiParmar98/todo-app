@@ -8,8 +8,8 @@ import { Route, Routes } from "react-router-dom";
 import SignUp from "./Pages/signup";
 
 const publicRoutesOptions = [
-  { component: <SignUp />, path: "/" },
-  { component: <Login />, path: "/login" },
+  { component: <Login />, path: "/" },
+  { component: <SignUp />, path: "/signup" },
   { component: <TodoList />, path: "/todolist" },
   { component: <TodoForm />, path: "/addtodo" },
   { component: <TodoForm isEdit />, path: "/edittodo/:id" },

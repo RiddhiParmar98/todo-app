@@ -12,12 +12,15 @@ import { useNavigate } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import GoogleIcon from "@mui/icons-material/Google";
+import EmailIcon from "@mui/icons-material/Email";
 
 import InputControl from "../InputControl";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { loginUser, logOutUser } from "./userSlice";
+import { blue } from "@mui/material/colors";
+
 import { useDispatch, useSelector } from "react-redux";
 import {
   FacebookAuthProvider,
@@ -30,6 +33,7 @@ import {
 import { app } from "../../firebase";
 
 const Login = () => {
+  const color = blue[900];
 
   const auth = getAuth(app);
   const navigate = useNavigate();
@@ -96,6 +100,9 @@ const Login = () => {
         // toast.error(GoogleAuthProvider.credentialFromError(err));
       });
   };
+  const handleSignUp = () => {
+    navigate("/signup", { replace: true });
+  };
 
   const handleFacebookSocialLogin = () => {
     const provider = new FacebookAuthProvider();
@@ -151,7 +158,6 @@ const Login = () => {
           backgroundPosition: "center",
         }}
       />
-
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
         <Box
           sx={{
@@ -203,11 +209,6 @@ const Login = () => {
                   autoComplete="current-password"
                   {...getFieldProps("password")}
                 />
-                {/* <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              /> */}
-
                 <Button
                   type="submit"
                   fullWidth
@@ -230,41 +231,33 @@ const Login = () => {
                     fullWidth
                     onClick={handleGoogleSocialLogin}
                     sx={{ mt: 1 }}
-                    color="primary"
+                    color="error"
                     startIcon={<GoogleIcon />}
                   >
                     Login with Google
                   </Button>
 
                   <Button
-                    variant="outlined"
+                    variant="contained"
                     type="submit"
                     fullWidth
                     onClick={handleFacebookSocialLogin}
-                    sx={{ mt: 1 }}
-                    color="secondary"
+                    sx={{ mt: 1, backgroundColor: "#0d47a1" }}
                     startIcon={<FacebookIcon />}
                   >
                     Login with Facebook
                   </Button>
-
                   <Button
-                    // variant="outlined"
-                    onClick={handleLogout}
-                    color="error"
+                    variant="contained"
+                    type="submit"
+                    fullWidth
+                    onClick={handleSignUp}
+                    sx={{ mt: 1, backgroundColor: "grey" }}
+                    startIcon={<EmailIcon />}
+                    size="small"
                   >
-                    Logout
+                    Sign up with Email and Password
                   </Button>
-                  {/* <Grid item xs>
-                  <Link to="/" variant="body2">
-                    Forgot password?
-                  </Link>
-                </Grid>  */}
-                  {/* <Grid item xs>
-                    <Link to="/" style={{ color: "blue" }}>
-                        {"Don't have an account? Sign Up"}
-                    </Link>
-                </Grid>  */}
                 </Grid>
               </Box>
             )}
