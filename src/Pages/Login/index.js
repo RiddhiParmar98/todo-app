@@ -13,12 +13,11 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import GoogleIcon from "@mui/icons-material/Google";
 // import EmailIcon from "@mui/icons-material/Email";
-
 import InputControl from "../InputControl";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-import { loginUser, logOutUser } from "./userSlice";
+import { createUser, loginUser } from "./userSlice";
 import { blue } from "@mui/material/colors";
 
 import { useDispatch } from "react-redux";
@@ -32,7 +31,7 @@ import {
 } from "firebase/auth";
 import { app, db } from "../../firebase";
 // import { collection, getDocs } from "firebase/firestore";
-
+import { addDoc, collection } from "firebase/firestore";
 const Login = (props) => {
   const { users } = props;
   // const color = blue[900];
@@ -94,62 +93,61 @@ const Login = (props) => {
     //   });
   };
 
-  const handleGoogleSocialLogin = () => {
+  const handleGoogleSocialLogin = async () => {
+    const id = `id${Math.floor(Math.random() * 1000000000)}`;
+    const date = new Date();
     const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
+    await signInWithPopup(auth, provider)
       .then((result) => {
         const credential = GoogleAuthProvider.credentialFromResult(result);
+        const username = result?.user?.displayName?.split(" ");
         const userData = {
-          accessToken: result?.user?.accessToken,
-          user: result?.user,
+          id: id,
+          date: date,
+          username: result?.user?.displayName,
+          email: result?.user?.email,
+          firstname: username[0],
+          lastname: username[1],
         };
-        dispatch(loginUser(userData));
-        localStorage.setItem("accessToken", result?.user?.accessToken);
+        const docRef = addDoc(collection(db, "registerUser"), {
+          user: userData,
+        });
+        dispatch(createUser(userData));
+        localStorage.setItem("accessToken", userData?.accessToken);
         navigate("/todolist", { replace: true });
       })
       .catch((error) => {
-        const errorCode = error.code;
         const errorMessage = error.message;
         toast.error(errorMessage);
-        // const email = error.customData.email;
-        // toast.error(GoogleAuthProvider.credentialFromError(err));
       });
-  };
-  const handleSignUp = () => {
-    navigate("/signup", { replace: true });
   };
 
   const handleFacebookSocialLogin = () => {
+    const id = `id${Math.floor(Math.random() * 1000000000)}`;
+    const date = new Date();
     const provider = new FacebookAuthProvider();
     signInWithPopup(auth, provider)
       .then((result) => {
         const credential = FacebookAuthProvider.credentialFromResult(result);
-        const userData = {
-          accessToken: result?.user?.accessToken,
-          user: result?.user,
-        };
-        dispatch(loginUser(userData));
+        // const username = result?.user?.displayName?.split(" ");
+        // const userData = {
+        //   id: id,
+        //   date: date,
+        //   username: result?.user?.displayName,
+        //   email: result?.user?.email,
+        //   firstname: username[0],
+        //   lastname: username[1],
+        // };
+        // const docRef = addDoc(collection(db, "registerUser"), {
+        //   user: userData,
+        // });
+        // dispatch(createUser(userData));
         localStorage.setItem("accessToken", result?.user?.accessToken);
         navigate("/todolist", { replace: true });
       })
       .catch((error) => {
-        const errorCode = error.code;
         const errorMessage = error.message;
-        const email = error.customData.email;
-        const credential = FacebookAuthProvider.credentialFromError(error);
         toast.error(errorMessage);
-      });
-  };
-
-  const handleLogout = () => {
-    signOut(auth)
-      .then(() => {
-        dispatch(logOutUser());
-        localStorage.clear();
-        navigate("/", { replace: true });
-      })
-      .catch((error) => {
-        console.log("error", error);
       });
   };
 
@@ -240,7 +238,6 @@ const Login = (props) => {
                 <Grid container>
                   <Button
                     variant="contained"
-                    type="submit"
                     fullWidth
                     onClick={handleGoogleSocialLogin}
                     sx={{ mt: 1 }}
@@ -252,7 +249,6 @@ const Login = (props) => {
 
                   <Button
                     variant="contained"
-                    type="submit"
                     fullWidth
                     onClick={handleFacebookSocialLogin}
                     sx={{ mt: 1, backgroundColor: "#0d47a1" }}
