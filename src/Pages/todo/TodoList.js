@@ -6,10 +6,14 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import { deleteTodo } from "./TodoSlice";
 import { useNavigate } from "react-router-dom";
+import { getAuth, signOut } from "firebase/auth";
+import { app } from "../../firebase";
+import { logOutUser } from "../Login/userSlice";
 import Swal from "sweetalert2";
 
 const TodoList = (props) => {
   const { todos } = props;
+  const auth = getAuth(app);
   const todo = useSelector((state) => [...state.todo.todos]);
   const loginUser = useSelector((state) => state.user.loginUser);
   const currentTodo = todo.filter(
@@ -29,7 +33,6 @@ const TodoList = (props) => {
   const handleDelete = (event, id) => {
     Swal.fire({
       title: "Are you sure you want to delete this?",
-      // text: "You won't be able to revert this!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -38,6 +41,18 @@ const TodoList = (props) => {
     }).then((result) => {
       dispatch(deleteTodo(id));
     });
+  };
+
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        dispatch(logOutUser());
+        localStorage.clear();
+        navigate("/");
+      })
+      .catch((error) => {
+        console.log("error", error);
+      });
   };
 
   const columns = [
@@ -53,7 +68,6 @@ const TodoList = (props) => {
       field: "action",
       headerName: "Action",
       sortable: false,
-      // disableClickEventBubbling: true,
       disableSelectionOnClick: true,
       disableColumnMenu: true,
       width: 200,
@@ -98,6 +112,14 @@ const TodoList = (props) => {
           />
           Add TODO
         </Button>
+
+        <Button
+          variant="contained"
+          sx={{ backgroundColor: "red", ml: "89%", borderRadius: 4 }}
+          onClick={handleLogout}
+        >
+          Logout
+        </Button>
       </Box>
       <Box
         sx={{
@@ -114,7 +136,6 @@ const TodoList = (props) => {
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5]}
-            // checkboxSelection
           />
         </div>
       </Box>

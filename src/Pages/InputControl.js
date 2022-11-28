@@ -1,5 +1,5 @@
 import React from "react";
-import { FormControl, InputLabel, OutlinedInput } from "@mui/material";
+import { InputLabel } from "@mui/material";
 import { Field, ErrorMessage } from "formik";
 import TextError from "./TextError";
 
