@@ -11,8 +11,13 @@ import Swal from "sweetalert2";
 const TodoList = (props) => {
   const { todos } = props;
   const todo = useSelector((state) => [...state.todo.todos]);
+  const loginUser = useSelector((state) => state.user.loginUser);
+  const currentTodo = todo.filter(
+    (todo, idx) => todo.userId === loginUser[0].id
+  );
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const handleAddList = () => {
     navigate("/addtodo", { replace: true });
   };
@@ -20,6 +25,7 @@ const TodoList = (props) => {
     navigate(`/edittodo/${id}`, { replace: true });
   };
 
+  console.log("todo", todo);
   const handleDelete = (event, id) => {
     Swal.fire({
       title: "Are you sure you want to delete this?",
@@ -104,7 +110,7 @@ const TodoList = (props) => {
       >
         <div style={{ height: 400, width: "100%" }}>
           <DataGrid
-            rows={todo}
+            rows={currentTodo}
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5]}

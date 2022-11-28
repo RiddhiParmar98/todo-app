@@ -21,20 +21,20 @@ import { toast } from "react-toastify";
 import { loginUser, logOutUser } from "./userSlice";
 import { blue } from "@mui/material/colors";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   FacebookAuthProvider,
   getAuth,
   GoogleAuthProvider,
-  signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
 } from "firebase/auth";
 import { app, db } from "../../firebase";
 // import { collection, getDocs } from "firebase/firestore";
 
-const Login = (props) => {
-  const { users } = props;
+const Login = () => {
+  const user = useSelector((state) => [...state.user.user]);
+  console.log("user :>> ", user);
   // const color = blue[900];
   const auth = getAuth(app);
   const navigate = useNavigate();
@@ -51,19 +51,20 @@ const Login = (props) => {
   const handleSubmit = (values, { setSubmitting }) => {
     try {
       const getUser =
-        users.length &&
-        users.filter(
+        user.length &&
+        user.filter(
           (dataItem, idx) =>
-            values.email === dataItem.user.email &&
-            values.password === dataItem.user.password
+            values.email === dataItem.email &&
+            values.password === dataItem.password
         );
-
       if (getUser.length !== 0) {
         navigate("/todolist", { replace: true });
+        dispatch(loginUser(getUser));
       } else {
         toast.error("Incorrect email id or password");
       }
     } catch (error) {
+      console.log("error log in", error);
       toast.error("Invalid Credentials");
     }
     // try {
