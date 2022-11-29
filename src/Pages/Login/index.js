@@ -33,7 +33,6 @@ import { app, db } from "../../firebase";
 import { addDoc, collection } from "firebase/firestore";
 const Login = () => {
   const user = useSelector((state) => [...state.user.user]);
-  console.log("user :>> ", user);
   // const color = blue[900];
   const auth = getAuth(app);
   const navigate = useNavigate();
@@ -50,7 +49,7 @@ const Login = () => {
   const handleSubmit = (values, { setSubmitting }) => {
     try {
       const getUser =
-        user.length &&
+        user.length > 0 &&
         user.filter(
           (dataItem, idx) =>
             values.email === dataItem.email &&
@@ -63,7 +62,6 @@ const Login = () => {
         toast.error("Incorrect email id or password");
       }
     } catch (error) {
-      console.log("error log in", error);
       toast.error("Invalid Credentials");
     }
     // try {

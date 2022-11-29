@@ -16,7 +16,7 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import InputControl from "../InputControl";
 import { useDispatch, useSelector } from "react-redux";
-import { createUser } from "../Login/userSlice";
+import { createUser, loginUser } from "../Login/userSlice";
 import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import { app } from "../../firebase";
 import { addDoc, collection, getDocs } from "firebase/firestore";
@@ -36,7 +36,6 @@ const SignUp = (props) => {
     password: "",
     cPassword: "",
   };
-  console.log("user :>> ", user);
   const validationSchema = Yup.object({
     firstname: Yup.string()
       .max(20, "Must be 15 characters or less")
@@ -69,9 +68,10 @@ const SignUp = (props) => {
         date,
         ...values,
       };
-      const isUserExisted = user.findIndex(
-        (userItem, idx) => userItem.email === values.email
-      );
+      newUser && dispatch(loginUser([newUser]));
+      const isUserExisted =
+        user &&
+        user.findIndex((userItem, idx) => userItem.email === values.email);
       if (isUserExisted >= 0) {
         toast.error("User with this email already exists.");
       } else {
@@ -88,6 +88,7 @@ const SignUp = (props) => {
           user: newUser,
         });
         dispatch(createUser(newUser));
+
         navigate("/todolist", { replace: true });
       }
     } catch (e) {

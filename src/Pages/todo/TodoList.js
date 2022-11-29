@@ -16,9 +16,9 @@ const TodoList = (props) => {
   const auth = getAuth(app);
   const todo = useSelector((state) => [...state.todo.todos]);
   const loginUser = useSelector((state) => state.user.loginUser);
-  const currentTodo = todo.filter(
-    (todo, idx) => todo.userId === loginUser[0].id
-  );
+  const currentTodo =
+    loginUser.length > 0 &&
+    todo.filter((todo, idx) => todo.userId === loginUser[0].id);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -29,7 +29,6 @@ const TodoList = (props) => {
     navigate(`/edittodo/${id}`, { replace: true });
   };
 
-  console.log("todo", todo);
   const handleDelete = (event, id) => {
     Swal.fire({
       title: "Are you sure you want to delete this?",
@@ -47,7 +46,6 @@ const TodoList = (props) => {
     signOut(auth)
       .then(() => {
         dispatch(logOutUser());
-        localStorage.clear();
         navigate("/");
       })
       .catch((error) => {

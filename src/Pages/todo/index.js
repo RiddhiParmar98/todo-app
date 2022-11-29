@@ -22,7 +22,7 @@ import { db } from "../../firebase";
 const TodoForm = (props) => {
   const { isEdit } = props;
   const todo = useSelector((state) => [...state.todo.todos]);
-  const loginUser = useSelector((state) => state.user.loginUser);
+  const loginUser = useSelector((state) => state.user.loginUser);                                                                      
   const param = useParams();
   const fileRef = useRef(null);
   const updateDataIndex = todo.findIndex(
