@@ -61,10 +61,10 @@ const SignUp = (props) => {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      const id = `id${Math.floor(Math.random() * 1000000000)}`;
+      const userId = `id${Math.floor(Math.random() * 1000000000)}`;
       const date = new Date();
       const newUser = {
-        id,
+        userId,
         date,
         ...values,
       };

@@ -9,7 +9,7 @@ export const todoSlice = createSlice({
   initialState,
   reducers: {
     fetchTodo: (state, action) => {
-      state.todos = action.payload.map((todo, idx) => todo.todo);
+      state.todos = [...action.payload];
     },
     createTodo: (state, action) => {
       state.todos = [...state.todos, action.payload];
@@ -27,9 +27,12 @@ export const todoSlice = createSlice({
         (data, idx) => data.id !== action.payload
       );
     },
+    clearTodo: (state, action) => {
+      state.todos = [];
+    },
   },
 });
 
-export const { createTodo, editTodo, deleteTodo, fetchTodo } =
+export const { createTodo, editTodo, deleteTodo, fetchTodo, clearTodo } =
   todoSlice.actions;
 export default todoSlice.reducer;

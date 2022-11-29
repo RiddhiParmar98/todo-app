@@ -4,7 +4,7 @@ import { Box, Button } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import { deleteTodo } from "./TodoSlice";
+import { clearTodo, deleteTodo } from "./TodoSlice";
 import { useNavigate } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
 import { app } from "../../firebase";
@@ -14,11 +14,7 @@ import Swal from "sweetalert2";
 const TodoList = (props) => {
   const { todos } = props;
   const auth = getAuth(app);
-  const todo = useSelector((state) => [...state.todo.todos]);
-  const loginUser = useSelector((state) => state.user.loginUser);
-  const currentTodo =
-    loginUser.length > 0 &&
-    todo.filter((todo, idx) => todo.userId === loginUser[0].id);
+  const todo = useSelector((state) => state.todo.todos);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -46,6 +42,7 @@ const TodoList = (props) => {
     signOut(auth)
       .then(() => {
         dispatch(logOutUser());
+        dispatch(clearTodo());
         navigate("/");
       })
       .catch((error) => {
@@ -130,7 +127,7 @@ const TodoList = (props) => {
       >
         <div style={{ height: 400, width: "100%" }}>
           <DataGrid
-            rows={currentTodo}
+            rows={todo}
             columns={columns}
             pageSize={5}
             rowsPerPageOptions={[5]}

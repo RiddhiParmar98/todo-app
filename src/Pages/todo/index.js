@@ -22,12 +22,10 @@ import { db } from "../../firebase";
 const TodoForm = (props) => {
   const { isEdit } = props;
   const todo = useSelector((state) => [...state.todo.todos]);
-  const loginUser = useSelector((state) => state.user.loginUser);                                                                      
-  const param = useParams();
-  const fileRef = useRef(null);
-  const updateDataIndex = todo.findIndex(
-    (todoItem) => todoItem.id === param.id
-  );
+  const loginUser = useSelector((state) => state.user.loginUser);  const param = useParams();
+const fileRef = useRef(null);
+  const updateDataIndex =
+    isEdit && todo.findIndex((todoItem) => todoItem.id === param.id);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleClick = () => {
@@ -60,11 +58,11 @@ const TodoForm = (props) => {
       const newTodo = {
         id,
         date,
-        userId: loginUser[0].id,
+        userId: loginUser[0].userId,
         ...values,
       };
-      dispatch(createTodo(newTodo));
       await addDoc(collection(db, "todos"), { todo: newTodo });
+      dispatch(createTodo(newTodo));
     }
     navigate("/todolist", { replace: true });
   };

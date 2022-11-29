@@ -52,12 +52,13 @@ const Login = () => {
         user.length > 0 &&
         user.filter(
           (dataItem, idx) =>
-            values.email === dataItem.email &&
-            values.password === dataItem.password
+            values.email === dataItem.user.email &&
+            values.password === dataItem.user.password
         );
+      
       if (getUser.length !== 0) {
-        navigate("/todolist", { replace: true });
         dispatch(loginUser(getUser));
+        navigate("/todolist", { replace: true });
       } else {
         toast.error("Incorrect email id or password");
       }

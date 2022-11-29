@@ -10,7 +10,7 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     fetchUser: (state, action) => {
-      state.user = action.payload.map((user, idx) => user.user);
+      state.user = [...action.payload];
     },
     loginUser: (state, action) => {
       state.loginUser = action.payload;
